@@ -1,0 +1,90 @@
+Installation and setup notes for sidd-1.0, 24th Nov 2008.
+---------------------------------------------------------
+
+Installation steps
+------------------
+1/ Obtain and install FFTW3 from www.fftw.org
+
+2/ Compile the sidd source with
+
+   ./configure
+   make
+
+3/ Edit sidd.conf to suit your requirements.  Select an output policy from the
+   three available.  
+
+4/ Start sidd in verbose foreground mode with the command
+
+   ./sidd -vvf
+
+   The program will output peak and rms readings in the range 0.0 to 1.0
+   Adjust your mixer gain settings to leave a little headroom on the peak
+   reading.
+
+5/ Plot the utility spectrum file
+
+6/ Check the data file columns are the ones you want.
+
+7/ Set your PC clock and activate your favourite time synchronisation 
+   software.  Make sure it slews the clock rather than stepping the time.
+
+8/ Restart sidd in background with
+
+  ./sidd -v
+
+9/ After a period of time, plot some of the data from the output file.
+
+10/ After a midnight crossing, make sure sidd has switched to the next
+    output file.
+
+Command line options
+--------------------
+There are just a few command line options - most controls are
+in the config file. 
+
+ -v    Be a little more verbose with log messages. 
+       Use several -v for more detail.
+
+ -f    Run in foreground.  By default, sidd detaches from the process
+       group and terminal and becomes a daemon.  In foreground mode,
+       log messages are duplicated to stderr.
+
+ -c config_file   Run with a specified config file.  By default, sidd looks
+                  for a file sidd.conf in the current directory.
+
+Miscellaneous notes
+-------------------
+*
+sidd will set the soundcard to the nearest available sample rate to that
+specified in sidd.conf
+
+*
+24 bit soundcards may return data in 32 bit words.  Try setting 'bits 24'
+and if sidd reports the mode unavailable, use 'bits 32'.
+
+*
+Make sure you have enough disk space.   The example sidd.conf with 8 bands
+generates files of about 100Mbytes per day, which compress down to about 
+30Mbytes.    Arrange scripts for plotting.  Arrange scripts for compressing
+and archiving files that are a few days old.
+
+*
+If your PC is set to autoboot after a power outage, you might want to put
+a startup command for sidd into /etc/rc.d/rc.local or similar - but make
+sure the RTC and mixer setting commands are done first.
+
+Revisions
+---------
+v0.9: Original.
+v0.91: Fixes a header file problem with some gcc.
+       No longer produces a static binary.
+v0.93: Another bug fixed.
+       Added control of mixer input and gains.
+       Added stereo mode to make a 2 channel monitor. 
+v1.0: Various output policies.
+      Removed mixer controls.
+      24 and 32 bit modes.
+      Builds using autoconf.
+      Uses either ALSA or OSS.
+      User specified file names and formats.
+

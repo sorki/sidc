@@ -1,0 +1,139 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;  General Options                                                            ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Specify a file into which sidd will write messages.  This file is written
+; using open/append/close, so that you can apply a straightforward log rotate
+; policy
+logfile /home/pws/sidd/sidd.log
+
+; Specify a directory to contain output data files.  Use '.' for the
+; current directory.
+datadir /home/pws/vlf/data
+
+; Enable real time scheduling of sidd.  Recommended so that soundcard buffers
+; are read promptly, which means minimum latency before each fft buffer is
+; timestamped. You have to be running as root for this to work.
+sched high
+
+; Specify the email address of whoever is to get any bad news.
+; mail someone@someplace
+
+; The loss-of-signal warning threshold and time delay.  If the input
+; signal peak level (0-1.0) falls below the given threshold for more than
+; the delay time, a warning will be issued.  The threshold applies to both
+; left and right in stereo mode, on the assumption that you've set the gains
+; so that the signal levels are about the same anyway.
+;los 0.1 10
+
+; Specify a file into which spectrum data will regularly be written.
+; This file is independent of the data record policy specified below.
+;
+; This file is overwritten with a fresh spectrum at intervals specified by
+; the second parameter in seconds.
+;
+; This spectrum file contains three space separated columns:
+; bin centre frequency (Hz), and the average power in the bin for the left
+; and right channels.  In mono mode there are just two columns
+; utility_spectrum /tmp/sidspec 100
+
+; Initialisation delay.  Some combinations of PC and soundcard might need a
+; short delay between initialising the soundcard and starting to read data.
+card_delay 3   ; Seconds 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;  Soundcard Settings                                                         ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; The input device
+device /dev/dsp
+
+; Specify the mode of operation - stereo or mono.
+mode mono
+
+; The requested sample rate.  The software will use the closest
+; setting available from the soundcard.
+rate 48000
+
+; Sample width, 8, 16, 24, or 32 bits.   
+bits 16
+
+; Number of frequency bins to use.  This determines the frequency resolution,
+;   resolution = rate / (2 * bins)
+; For best efficiency, specify a power of 2, but this is not essential
+bins 512
+
+; Number of samples or sample pairs to read from the soundcard per read call
+nread 256
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;  Data File Settings                                                         ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Output policy.  This keyword selects which of the available data output
+; policies to use. The available options are:-
+;
+; SPECTRUM:  Output a whole spectrum.  Your post-processing can decide later
+;            just which blocks of spectrum to monitor.
+; 
+; BANDS_MULTI:  Monitor specific frequency bands, output all monitors to
+;               a single multi-column data file,
+;
+; BANDS_EACH:  Monitor specific frequency bands, output each monitor to its
+;              own data file.
+
+output_policy SPECTRUM
+
+; Output interval.  Approximate number of seconds between output records. 
+; The program will integrate whole FT frames until this interval is reached
+; and will then output a data record.  Set this value to zero to obtain an
+; output record for every FT frame.
+
+output_interval 2
+
+; Output data file names.  Compose a filename format using the following %
+; codes. All other characters are taken literally.  Must not contain spaces.
+;
+; %y 2-digit year    %H 2-digit hour
+; %m 2-digit month   %M 2-digit mins 
+; %d 2-digit day     %S 2-digit secs
+;                                     
+; %E seconds into current day 0..86399
+; %e as %E but with millisecond resolution 0.000 to 86399.999
+; %% a literal %
+;   
+; %B band ident - only valid with output policy BANDS_EACH
+; %U unix epoch time integer - seconds since midnight Jan 1st 1970
+; %u as %U but with millisecond resolution
+; %s seconds with milliseconds resolution 00.000 to 59.999
+
+output_files %y-%m-%d.dat
+
+; Specify the format of the timestamp to use in the datafiles.  This is the
+; first field of each data record.  % codes are substituted as above
+timestamp %E
+
+; Data file header.  Set to yes if each data file is to have a header record
+output_header yes
+
+; Format and precision of relative power levels in output records. Specify
+; using a 'printf' style floating point format specifier.
+field_format %.0f
+
+; Relative power values can be logged as either linear or db
+field_scale db
+
+; Adjustment (dB) to be applied to all output values.  This may be used
+; to reduce the size of output files by eliminating leading minus signs
+; when using logarithmic mode
+offset_db  37
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Settings for output policy SPECTRUM                                         ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;  These options are ignored when not using output policy SPECTRUM
+
+; Specify spectrum range to output - Hertz. 
+spectrum_range 14000 24000
+

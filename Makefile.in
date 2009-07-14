@@ -1,0 +1,34 @@
+DESTDIR =
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+topdir = @srcdir@
+srcdir = @srcdir@
+
+bindir = $(DESTDIR)@bindir@
+mandir = $(DESTDIR)@mandir@/man1
+
+CC = @CC@
+CFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@
+DEFS = @DEFS@
+LIBS = @LIBS@
+
+$(topdir)/sidd: $(srcdir)/sidd.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFS) -o $@ $< $(LIBS)
+
+install: $(topdir)/sidd
+	install sidd -s $(bindir)
+
+uninstall:
+	rm -f $(bindir)/sidd
+
+clean:
+	rm -f $(topdir)/sidd 
+
+distclean: clean
+	rm -f $(topdir)/Makefile \
+              $(topdir)/config.status \
+              $(topdir)/config.log \
+              $(topdir)/config.h \
+              $(topdir)/config.cache
+
