@@ -15,7 +15,7 @@
 
 //
 //  Name of the default configuration file.  Override with -c option
-#define CONFIG_FILE "sidd.conf"
+#define CONFIG_FILE "/etc/sidd.conf"
 
 //
 //  End of tuneable definitions.
@@ -159,10 +159,10 @@ double DF;                                   // Frequency resolution of the FFT
 int bailout_flag = 0;                           // To prevent bailout() looping
 int grab_cnt = 0;                       // Count of samples into the FFT buffer
 
-char logfile[100] = "/tmp/sidd.log";
+char logfile[100] = "/var/log/sidd/sidd.log";
 char CF_device[100] = DEVICE;                          // Soundcard device name
 
-char CF_datadir[100] = ".";                       // Directory for output files
+char CF_datadir[100] = "/var/lib/sidd/";                       // Directory for output files
 
 #define FFTWID (2 * CF_bins)                  // Number of samples per FT frame
 
