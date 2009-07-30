@@ -565,7 +565,29 @@ int read_soundcard( char *buf)
 //  Output Functions                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 
-int substitute_params( char *d, struct timeval *tv, 
+/* Appends formatted string to *d while extending allocation */
+int append_sprintf( char **d, char *format, ...)
+{
+   int len;
+   int ret;
+   char *tgt;
+   va_list ap;
+
+   va_start( ap, format);
+   len = vsnprintf( NULL, 0, format, ap) + 1;
+   va_end( ap);
+   *d = *d ? realloc( *d, strlen( *d) + len) : malloc( len);
+   if (!*d)
+      bailout( "could not allocate memory, %s", strerror( errno));
+   tgt = *d + strlen( *d);
+   va_start( ap, format);
+   ret = vsprintf( tgt, format, ap);
+   va_end( ap);
+
+   return ret;
+}
+
+int substitute_params( char **d, struct timeval *tv,
                               char *format, char *band)
 {
    double fsecs = tv->tv_sec + 1e-6 * tv->tv_usec;
@@ -574,34 +596,33 @@ int substitute_params( char *d, struct timeval *tv,
 
    while( *format)
    {
-      if( *format != '%') { *d++ = *format++; continue; }
+      if( *format != '%') { append_sprintf( d, "%c", *format++); continue; }
 
       format++;
       switch( *format++)
       {
-         case '%': *d++ = '%'; break;
+         case '%': append_sprintf( d, "%c", *format++); break;
 
-         case 'y': d += sprintf( d, "%02d", tm->tm_year % 100);  break;
-         case 'm': d += sprintf( d, "%02d", tm->tm_mon+1); break;
-         case 'd': d += sprintf( d, "%02d", tm->tm_mday); break;
+         case 'y': append_sprintf( d, "%02d", tm->tm_year % 100);  break;
+         case 'm': append_sprintf( d, "%02d", tm->tm_mon+1); break;
+         case 'd': append_sprintf( d, "%02d", tm->tm_mday); break;
 
-         case 'H': d += sprintf( d, "%02d", tm->tm_hour);  break;
-         case 'M': d += sprintf( d, "%02d", tm->tm_min);  break;
-         case 'S': d += sprintf( d, "%02d", tm->tm_sec);  break;
+         case 'H': append_sprintf( d, "%02d", tm->tm_hour);  break;
+         case 'M': append_sprintf( d, "%02d", tm->tm_min);  break;
+         case 'S': append_sprintf( d, "%02d", tm->tm_sec);  break;
 
          case 'B': if( !band) bailout( "cannot specify %B in this mode");
-                   d += sprintf( d, "%s", band);   break;
-         case 'U': d += sprintf( d, "%ld", tv->tv_sec); break;
-         case 'u': d += sprintf( d, "%.3f", fsecs);  break;
+                   append_sprintf( d, "%s", band);   break;
+         case 'U': append_sprintf( d, "%ld", tv->tv_sec); break;
+         case 'u': append_sprintf( d, "%.3f", fsecs);  break;
 
-         case 'E': d += sprintf( d, "%d", (int)(tv->tv_sec % 86400)); break;
-         case 'e': d += sprintf( d, "%.3f", 1e-6 * tv->tv_usec + 
+         case 'E': append_sprintf( d, "%d", (int)(tv->tv_sec % 86400)); break;
+         case 'e': append_sprintf( d, "%.3f", 1e-6 * tv->tv_usec + 
                                             (tv->tv_sec % 86400)); break;
          default: return 0;
       }
    }
 
-   *d = 0;
    return 1;
 }
 
@@ -609,9 +630,9 @@ void output_record_multi( struct timeval *tv)
 {
    int i, j;
    struct BAND *b;
-   char prefix[100], stamp[100], filename[100];
+   char *prefix = NULL, *stamp = NULL, *filename = NULL;
 
-   if( !substitute_params( prefix, tv, CF_output_files, NULL))
+   if( !substitute_params( &prefix, tv, CF_output_files, NULL))
       bailout( "error in output_files configuration");
 
    if( bound_strcmp( prefix, out_prefix))
@@ -619,7 +640,7 @@ void output_record_multi( struct timeval *tv)
       if( out_prefix) free( out_prefix);
       out_prefix = strdup( prefix);
 
-      sprintf( filename, "%s/%s", CF_datadir, out_prefix); 
+      append_sprintf( &filename, "%s/%s", CF_datadir, out_prefix); 
       report( 0, "using output file [%s]", filename);
 
       if( bm_fo) fclose( bm_fo);
@@ -644,9 +665,11 @@ void output_record_multi( struct timeval *tv)
             fputs( "\n", bm_fo);
          }
       }
+
+      free( filename);
    }
 
-   substitute_params( stamp, tv, CF_timestamp, NULL);
+   substitute_params( &stamp, tv, CF_timestamp, NULL);
 
    fprintf( bm_fo, "%s %.3f %.3f %.3f %.3f", stamp, left.peak, right.peak,
                  sqrt( left.sum_sq/FFTWID), sqrt( right.sum_sq/FFTWID));
@@ -664,15 +687,18 @@ void output_record_multi( struct timeval *tv)
    }
    fputs( "\n", bm_fo);
    fflush( bm_fo);
+
+   free( prefix);
+   free( stamp);
 }
 
 void output_record_each( struct timeval *tv)
 {
    int i, j;
    struct BAND *b;
-   char prefix[100], stamp[100], filename[100];
+   char *prefix = NULL;
 
-   if( !substitute_params( prefix, tv, CF_output_files, "ID"))
+   if( !substitute_params( &prefix, tv, CF_output_files, "ID"))
       bailout( "error in output_files configuration");
 
    if( bound_strcmp( prefix, out_prefix))
@@ -683,9 +709,10 @@ void output_record_each( struct timeval *tv)
 
       for( b = bands, i = 0; i < nbands; i++, b++)
       {
+         char *prefix = NULL, *filename = NULL;
          if( b->fo) fclose( b->fo);
-         substitute_params( prefix, tv, CF_output_files, b->ident);
-         sprintf( filename, "%s/%s", CF_datadir, prefix);
+         substitute_params( &prefix, tv, CF_output_files, b->ident);
+         append_sprintf( &filename, "%s/%s", CF_datadir, prefix);
          if( (b->fo=fopen( filename, "a")) == NULL)
             bailout( "cannot open [%s], %s", filename, strerror( errno));
 
@@ -701,6 +728,9 @@ void output_record_each( struct timeval *tv)
 
             if( !st.st_size) fputs( "stamp power\n", b->fo);
          }
+
+         free( prefix);
+         free( filename);
       }
    }
 
@@ -709,8 +739,9 @@ void output_record_each( struct timeval *tv)
       double e = 0;
       int n1 = b->start/DF;
       int n2 = b->end/DF;
+      char *stamp = NULL;
 
-      substitute_params( stamp, tv, CF_timestamp, b->ident);
+      substitute_params( &stamp, tv, CF_timestamp, b->ident);
 
       for( j=n1; j<= n2; j++) e += b->side->powspec[j];
       e /= output_int * (n2 - n1 + 1);
@@ -719,15 +750,19 @@ void output_record_each( struct timeval *tv)
       fprintf( b->fo, CF_field_format, e);
       fputs( "\n", b->fo);
       fflush( b->fo);
+
+      free( stamp);
    }
+
+   free( prefix);
 }
 
 void output_spectrum_record( struct timeval *tv)
 {
    int i;
-   char stamp[100], prefix[100], filename[100];
+   char *stamp = NULL, *prefix = NULL;
 
-   if( !substitute_params( prefix, tv, CF_output_files, NULL))
+   if( !substitute_params( &prefix, tv, CF_output_files, NULL))
       bailout( "error in output_files configuration");
 
    if( bound_strcmp( prefix, out_prefix))
@@ -761,9 +796,11 @@ void output_spectrum_record( struct timeval *tv)
             fputs( "\n", sf_fo);
          }
       }
+
+      free( filename);
    }
 
-   substitute_params( stamp, tv, CF_timestamp, NULL);
+   substitute_params( &stamp, tv, CF_timestamp, NULL);
    fprintf( sf_fo, "%s", stamp);
 
    for( i=cuton; i<cutoff; i++)
@@ -776,6 +813,8 @@ void output_spectrum_record( struct timeval *tv)
 
    fputs( "\n", sf_fo);
    fflush( sf_fo);
+   free( prefix);
+   free( stamp);
 }
 
 void output_record( void)
