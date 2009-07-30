@@ -135,7 +135,7 @@ char *CF_uspec_file = NULL;                     // Filename of utility spectrum
 int uspec_cnt = 0;                        // Frame counter for utility spectrum
 int uspec_max = 0;                     // Number of frames per utility spectrum
 
-int CF_sample_rate = 192000;                              // Samples per second
+unsigned int CF_sample_rate = 192000;                     // Samples per second
 
 double CF_output_interval = 0;               // Output record interval, seconds
 int output_int;                               // Output record interval, frames
@@ -510,7 +510,7 @@ void setup_input_stream( void)
        (err = snd_pcm_hw_params_any( capture_handle, hw_params)) < 0)
       bailout( "cannot init hardware params struct (%s)\n", snd_strerror( err));
 
-   int rate_min, rate_max;
+   unsigned int rate_min, rate_max;
    snd_pcm_hw_params_get_rate_min( hw_params, &rate_min, 0);
    snd_pcm_hw_params_get_rate_max( hw_params, &rate_max, 0);
 
