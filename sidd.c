@@ -111,7 +111,7 @@
 //  Variables beginning CF_ are set directly by the configuration file.
 //
 
-char config_file[100] = CONFIG_FILE;
+char *config_file = CONFIG_FILE;
 
 int CF_chans = 1;                                      //  1 = mono, 2 = stereo
 int CF_bytes = 2;                                        // Sample width, bytes
@@ -120,9 +120,9 @@ int CF_bins = 2048;                                 // Number of frequency bins
 int CF_card_delay = 0;                    // Delay seconds before starting work
 int CF_output_header = 0;                // Whether to output data file headers
 int CF_nread = 2048;             // Number of samples (pairs) to read at a time
-char CF_output_files[100] = "%y%m%d.dat";            // Output file name format
-char CF_timestamp[100] = "%u";           // Format of timestamps in output file
-char CF_field_format[50] = "%.2e";     // Format of power fields in output file
+char *CF_output_files = "%y%m%d.dat";                // Output file name format
+char *CF_timestamp = "%u";               // Format of timestamps in output file
+char *CF_field_format = "%.2e";     // Format of power fields in output file
 int CF_log_scale = 0;             // Whether to output logarithmic power values
 
 double CF_offset_db = 0;             // Fixed offset to all output power values
@@ -131,7 +131,7 @@ int background = 1;                        // Set zero if running in foreground
 int VFLAG = 0;                                    //  Set non-zero by -v option
 
 double CF_uspec_secs = 30  ;    // Issue a spectrum for every spec_secs seconds
-char CF_uspec_file[100];                        // Filename of utility spectrum 
+char *CF_uspec_file = NULL;                     // Filename of utility spectrum 
 int uspec_cnt = 0;                        // Frame counter for utility spectrum
 int uspec_max = 0;                     // Number of frames per utility spectrum
 
@@ -148,7 +148,7 @@ int CF_output_peak = 0;                  // Set to 1 if peak output is required
 int CF_output_power = 0;          // Set to 1 if total power output is required
 
 int alert_on = 0;                  // Set when the program actually starts work
-char CF_mailaddr[100] = "";                       // Address for alert messages
+char *CF_mailaddr = NULL;                         // Address for alert messages
 
 double CF_los_thresh = 0;                 // Threshold for loss of signal, 0..1
 int CF_los_timeout = 0;     // Number of seconds before loss of signal declared
@@ -159,8 +159,8 @@ double DF;                                   // Frequency resolution of the FFT
 int bailout_flag = 0;                           // To prevent bailout() looping
 int grab_cnt = 0;                       // Count of samples into the FFT buffer
 
-char logfile[100] = "/var/log/sidd/sidd.log";
-char CF_device[100] = DEVICE;                          // Soundcard device name
+char *logfile = "/var/log/sidd/sidd.log";
+char *CF_device = DEVICE;                              // Soundcard device name
 
 char CF_datadir[100] = "/var/lib/sidd/";                       // Directory for output files
 
@@ -253,10 +253,10 @@ void report( int level, char *format, ...)
    vsprintf( temp, format, ap);
    va_end( ap);
 
-   if( !logfile[0] || !background)
+   if( !logfile || !background)
       if( background != 2) fprintf( stderr, "%s\n", temp);
 
-   if( logfile[0])
+   if( logfile)
    {
       time_t now = time( NULL);
       struct tm *tm = gmtime( &now);
@@ -284,7 +284,7 @@ void alert( char *format, ...)
  
    report( -1, "%s", temp);
 
-   if( !alert_on || !CF_mailaddr[0]) return;
+   if( !alert_on || !CF_mailaddr) return;
 
    sprintf( cmd, "mail -s 'sidd alert' '%s'", CF_mailaddr);
    if( (f=popen( cmd, "w")) == NULL)
@@ -358,7 +358,7 @@ void utility_spectrum( void)
    FILE *f;
    int i;
 
-   if( !CF_uspec_file[0]) return;     // Spectrum file not wanted.
+   if( !CF_uspec_file) return;     // Spectrum file not wanted.
 
    if( (f=fopen( CF_uspec_file, "w+")) == NULL)
       bailout( "cannot open spectrum file %s", strerror( errno));
@@ -1060,8 +1060,11 @@ void load_config( void)
       else
       if( nf == 2 && !strcasecmp( fields[0], "logfile"))
       {
-         strcpy( logfile, fields[1]);
-         report( 1, "logfile %s", logfile);
+         if(strlen( logfile))
+            logfile = strdup( fields[1]);
+         else
+            logfile = NULL;
+         report( 1, "logfile %s", logfile ? logfile : "(none)");
       }
       else
       if( nf == 3 && !strcasecmp( fields[0], "los"))
@@ -1073,7 +1076,7 @@ void load_config( void)
       }
       else
       if( nf == 2 && !strcasecmp( fields[0], "device"))
-         strcpy( CF_device, fields[1]);
+         CF_device = strdup( fields[1]);
       else
       if( nf == 2 && !strcasecmp( fields[0], "mode"))
       {
@@ -1098,10 +1101,10 @@ void load_config( void)
       }
       else
       if( nf == 2 && !strcasecmp( fields[0], "output_files"))
-         strcpy( CF_output_files, fields[1]);
+         CF_output_files = strdup( fields[1]);
       else
       if( nf == 2 && !strcasecmp( fields[0], "timestamp"))
-         strcpy( CF_timestamp, fields[1]);
+         CF_timestamp = strdup( fields[1]);
       else
       if( nf == 2 && !strcasecmp( fields[0], "output_header"))
       {
@@ -1132,7 +1135,7 @@ void load_config( void)
       else
       if( nf == 3 && !strcasecmp( fields[0], "utility_spectrum"))
       {
-         strcpy( CF_uspec_file, fields[1]);
+         CF_uspec_file = strdup( fields[1]);
          CF_uspec_secs = atof( fields[2]);
       }
       else
@@ -1169,7 +1172,7 @@ void load_config( void)
          CF_nread = atoi( fields[1]);
       else
       if( nf == 2 && !strcasecmp( fields[0], "field_format"))
-         strcpy( CF_field_format, fields[1]);
+         CF_field_format = strdup( fields[1]);
       else
       if( nf == 2 && !strcasecmp( fields[0], "field_scale"))
       {
@@ -1181,7 +1184,7 @@ void load_config( void)
       }
       else
       if( nf == 2 && !strcasecmp( fields[0], "mail"))
-         strcpy( CF_mailaddr, fields[1]);
+         CF_mailaddr = strdup( fields[1]);
       else
          bailout( "error in config file, line %d", lino);
    }
@@ -1278,7 +1281,7 @@ int main( int argc, char *argv[])
       else
       if( c == 'f') background = 0;
       else
-      if( c == 'c') strcpy( config_file, optarg);
+      if( c == 'c') config_file = optarg;
       else 
       if( c == -1) break;
       else bailout( "unknown option [%c]", c);
@@ -1297,7 +1300,7 @@ int main( int argc, char *argv[])
             b->ident, b->start, b->end, b->side->name);
    }
 
-   if( background && !logfile[0]) 
+   if( background && !logfile) 
       report( -1, "warning: no logfile specified for daemon");
 
    if( background) make_daemon();
@@ -1307,7 +1310,7 @@ int main( int argc, char *argv[])
    DF = (double) CF_sample_rate/(double) FFTWID;
    report( 1, "resolution: bins=%d fftwid=%d df=%f", CF_bins, FFTWID, DF);
 
-   if( CF_uspec_file[0])
+   if( CF_uspec_file)
    {
       // Convert CF_uspec_secs seconds to uspec_max frames
       uspec_max = rint( CF_uspec_secs * CF_sample_rate / FFTWID);
@@ -1341,6 +1344,10 @@ int main( int argc, char *argv[])
    if( CF_priority) set_scheduling();   // Setup real time scheduling
 
    process_signal();
+   if( CF_uspec_file)
+      free( CF_uspec_file);
+   if( CF_mailaddr)
+      free( CF_mailaddr);
    return 0;
 }
 
