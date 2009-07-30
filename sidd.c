@@ -191,7 +191,7 @@ struct CHAN
 
 struct BAND
 {
-   char ident[50];
+   char *ident;
 
    struct CHAN *side;    // Input side to use, left or right
    int start, end;       // Frequency range, Hertz
@@ -990,7 +990,7 @@ void config_band( char *ident, char *start, char *end, char *side)
 
    if( nbands == MAXBANDS) bailout( "too many bands specified in config file");
 
-   strcpy( b->ident, ident);
+   b->ident = strdup( ident);
    b->start = atoi( start);
    b->end = atoi( end);
 
@@ -1344,6 +1344,15 @@ int main( int argc, char *argv[])
    if( CF_priority) set_scheduling();   // Setup real time scheduling
 
    process_signal();
+
+   if( CF_output_policy != OP_SPECTRUM)
+   {
+      int i;
+      struct BAND *b;
+
+      for( i=0, b=bands; i<nbands; i++, b++)
+         free( b->ident);
+   }
    if( CF_uspec_file)
       free( CF_uspec_file);
    if( CF_mailaddr)
