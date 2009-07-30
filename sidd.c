@@ -202,7 +202,10 @@ struct BAND
 
 int nbands = 0;
 
-char out_prefix[100];
+#define MIN( a, b)           ( a < b ? a : b)
+#define STRMIN( a, b)        MIN( strlen( a), strlen( b))
+#define bound_strcmp( a, b)  (!a || !b || strncmp( a, b, STRMIN( a, b)))
+char *out_prefix = NULL;
 
 //
 //  Output policy
@@ -611,9 +614,10 @@ void output_record_multi( struct timeval *tv)
    if( !substitute_params( prefix, tv, CF_output_files, NULL))
       bailout( "error in output_files configuration");
 
-   if( strcmp( prefix, out_prefix))
+   if( bound_strcmp( prefix, out_prefix))
    {
-      strcpy( out_prefix, prefix);
+      if( out_prefix) free( out_prefix);
+      out_prefix = strdup( prefix);
 
       sprintf( filename, "%s/%s", CF_datadir, out_prefix); 
       report( 0, "using output file [%s]", filename);
@@ -671,9 +675,10 @@ void output_record_each( struct timeval *tv)
    if( !substitute_params( prefix, tv, CF_output_files, "ID"))
       bailout( "error in output_files configuration");
 
-   if( strcmp( prefix, out_prefix))
+   if( bound_strcmp( prefix, out_prefix))
    {
-      strcpy( out_prefix, prefix);
+      if( out_prefix) free( out_prefix);
+      out_prefix = strdup( prefix);
       report( 0, "using output files [%s]", out_prefix);
 
       for( b = bands, i = 0; i < nbands; i++, b++)
@@ -725,9 +730,12 @@ void output_spectrum_record( struct timeval *tv)
    if( !substitute_params( prefix, tv, CF_output_files, NULL))
       bailout( "error in output_files configuration");
 
-   if( strcmp( prefix, out_prefix))
+   if( bound_strcmp( prefix, out_prefix))
    {
-      strcpy( out_prefix, prefix);
+      char *filename = NULL;
+
+      if( out_prefix) free( out_prefix);
+      out_prefix = strdup( prefix);
       sprintf( filename, "%s/%s", CF_datadir, out_prefix); 
       report( 0, "using output file [%s]", filename);
 
@@ -1357,6 +1365,8 @@ int main( int argc, char *argv[])
       free( CF_uspec_file);
    if( CF_mailaddr)
       free( CF_mailaddr);
+   if( out_prefix)
+      free( out_prefix);
    return 0;
 }
 
