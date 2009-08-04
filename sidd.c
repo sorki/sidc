@@ -246,11 +246,12 @@ FILE *sf_fo;
 
 void report( int level, char *format, ...)
 {
-   va_list ap;
+   va_list ap, ap2;
    void bailout( char *format, ...);
 
    if( VFLAG < level) return;
 
+   va_copy( ap2, ap);
    va_start( ap, format);
    if( !logfile || !background)
       if( background != 2) vfprintf( stderr, format, ap);
@@ -268,9 +269,9 @@ void report( int level, char *format, ...)
       fprintf( flog, "%04d/%02d/%02d %02d:%02d:%02d \n", 
                 tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
                 tm->tm_hour, tm->tm_min, tm->tm_sec);
-      va_start( ap, format);
-      fprintf( flog, format, ap);
-      va_end( ap);
+      va_start( ap2, format);
+      vfprintf( flog, format, ap2);
+      va_end( ap2);
       fclose( flog);
    }
 }
@@ -571,8 +572,9 @@ int append_sprintf( char **d, char *format, ...)
    int len;
    int ret;
    char *tgt;
-   va_list ap;
+   va_list ap, ap2;
 
+   va_copy( ap2, ap);
    va_start( ap, format);
    len = vsnprintf( NULL, 0, format, ap) + 1;
    va_end( ap);
@@ -580,8 +582,8 @@ int append_sprintf( char **d, char *format, ...)
    if (!*d)
       bailout( "could not allocate memory, %s", strerror( errno));
    tgt = *d + strlen( *d);
-   va_start( ap, format);
-   ret = vsprintf( tgt, format, ap);
+   va_start( ap2, format);
+   ret = vsprintf( tgt, format, ap2);
    va_end( ap);
 
    return ret;
