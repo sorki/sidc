@@ -254,7 +254,11 @@ void report( int level, char *format, ...)
    va_copy( ap2, ap);
    va_start( ap, format);
    if( !logfile || !background)
-      if( background != 2) vfprintf( stderr, format, ap);
+      if( background != 2)
+      {
+        vfprintf( stderr, format, ap);
+        fputc( '\n', stderr);
+      }
    va_end( ap);
 
    if( logfile)
@@ -266,12 +270,13 @@ void report( int level, char *format, ...)
       if( (flog = fopen( logfile, "a+")) == NULL)
          bailout( "cannot open logfile [%s]: %s", logfile, strerror( errno));
    
-      fprintf( flog, "%04d/%02d/%02d %02d:%02d:%02d \n", 
+      fprintf( flog, "%04d/%02d/%02d %02d:%02d:%02d ", 
                 tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
                 tm->tm_hour, tm->tm_min, tm->tm_sec);
       va_start( ap2, format);
       vfprintf( flog, format, ap2);
       va_end( ap2);
+      fputc( '\n', flog);
       fclose( flog);
    }
 }
