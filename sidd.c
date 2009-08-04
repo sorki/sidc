@@ -583,10 +583,15 @@ int append_sprintf( char **d, char *format, ...)
    va_start( ap, format);
    len = vsnprintf( NULL, 0, format, ap) + 1;
    va_end( ap);
-   *d = *d ? realloc( *d, strlen( *d) + len) : malloc( len);
+   if (*d)
+   {
+      *d = realloc( *d, strlen( *d) + len);
+      tgt = *d + strlen( *d);
+   } else {
+      tgt = *d = malloc( len);
+   }
    if (!*d)
       bailout( "could not allocate memory, %s", strerror( errno));
-   tgt = *d + strlen( *d);
    va_start( ap2, format);
    ret = vsprintf( tgt, format, ap2);
    va_end( ap);
