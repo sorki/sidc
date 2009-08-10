@@ -87,4 +87,4 @@ v1.0: Various output policies.
       Builds using autoconf.
       Uses either ALSA or OSS.
       User specified file names and formats.
-
+v1.1: Various fixes by Lubomir Rintel <lkundrak@v3.sk>
