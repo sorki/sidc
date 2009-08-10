@@ -13,17 +13,17 @@ LDFLAGS = @LDFLAGS@
 DEFS = @DEFS@
 LIBS = @LIBS@
 
-$(topdir)/sidd: $(srcdir)/sidd.c
+$(topdir)/sidc: $(srcdir)/sidc.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFS) -o $@ $< $(LIBS)
 
-install: $(topdir)/sidd
-	install sidd -s $(bindir)
+install: $(topdir)/sidc
+	install sidc -s $(bindir)
 
 uninstall:
-	rm -f $(bindir)/sidd
+	rm -f $(bindir)/sidc
 
 clean:
-	rm -f $(topdir)/sidd 
+	rm -f $(topdir)/sidc
 
 distclean: clean
 	rm -f $(topdir)/Makefile \
