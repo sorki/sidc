@@ -614,7 +614,7 @@ int substitute_params( char **d, struct timeval *tv,
                               char *format, char *band)
 {
    double fsecs = tv->tv_sec + 1e-6 * tv->tv_usec;
-   time_t ud = tv->tv_sec - tv->tv_sec % 86400;
+   time_t ud = tv->tv_sec;
    struct tm *tm = gmtime( &ud);
 
    while( *format)
