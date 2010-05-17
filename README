@@ -9,9 +9,10 @@ It is forked from sidc program wirrten by Paul Nicholson <sid0807@abelian.org> h
 2. Installation
 ---------------
 
-- First install FFTW3 dependency from www.fftw.org.
+- First install FFTW3 dependency from www.fftw.org or use your favorite package manager
+   to install `fftw-devel` package.
 
-- Configure and complite the source
+- Configure and compile the source
 
    ./configure
    make
