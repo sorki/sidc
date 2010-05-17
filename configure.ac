@@ -15,7 +15,7 @@ AC_SYS_LARGEFILE
 AC_SYS_LONG_FILE_NAMES
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h stdint.h stdlib.h string.h sys/ioctl.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h stdint.h stdlib.h string.h sys/ioctl.h unistd.h sys/time.h])
 
 AC_C_INLINE
 AC_STRUCT_TM
@@ -26,7 +26,8 @@ AC_FUNC_MALLOC
 AC_FUNC_SETPGRP
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([memset mkdir sqrt strchr strerror gettimeofday])
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([memset mkdir sqrt strchr strerror gettimeofday strdup])
 
 AC_CHECK_FUNCS([strcasecmp rint])
 AC_HEADER_TIME
