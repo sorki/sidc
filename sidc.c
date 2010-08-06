@@ -794,7 +794,7 @@ void output_spectrum_record( struct timeval *tv)
 
       if( out_prefix) free( out_prefix);
       out_prefix = strdup( prefix);
-      sprintf( filename, "%s/%s", CF_datadir, out_prefix); 
+      append_sprintf( &filename, "%s/%s", CF_datadir, out_prefix);
       report( 0, "using output file [%s]", filename);
 
       if( sf_fo) fclose( sf_fo);
