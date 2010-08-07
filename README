@@ -62,7 +62,7 @@ in the config file.
        log messages are duplicated to stderr.
 
  -c config_file   Run with a specified config file.  By default, sidc looks
-                  for a file sidc.conf in the current directory.
+                  for /etc/sidc.conf
 
 4 Miscellaneous notes
 ----------------------
