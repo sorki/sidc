@@ -672,21 +672,18 @@ void output_record_multi( struct timeval *tv)
 
       if( CF_output_header)
       {
-         // Header record required.  Output a header only if the file is
-         // empty - this may be a restart.
+         // Header record required.  Output a header every time sidc
+	 // is started - only way to handle band changes etc
          struct stat st;
 
          if( stat( filename, &st) < 0) 
             bailout( "cannot stat output file %s: %s", 
                filename, strerror( errno));
 
-         if( !st.st_size)
-         {
-            fputs( "stamp lpeak rpeak lrms rrms ", bm_fo);
-            for( b = bands, i = 0; i < nbands; i++, b++)
-               fprintf( bm_fo, "%s ", b->ident);
-            fputs( "\n", bm_fo);
-         }
+         fputs( "# stamp lpeak rpeak lrms rrms ", bm_fo);
+         for( b = bands, i = 0; i < nbands; i++, b++)
+            fprintf( bm_fo, "%s ", b->ident);
+         fputs( "\n", bm_fo);
       }
 
       free( filename);
@@ -741,15 +738,15 @@ void output_record_each( struct timeval *tv)
 
          if( CF_output_header)
          {
-            // Header record required.  Output a header only if the file is
-            // empty - this may be a restart.
+            // Header record required.  Output a header every time sidc
+	    // is started - only way to handle band changes etc
             struct stat st;
 
             if( stat( filename, &st) < 0) 
                bailout( "cannot stat output file %s: %s", 
                   filename, strerror( errno));
 
-            if( !st.st_size) fputs( "stamp power\n", b->fo);
+            fputs( "# stamp power\n", b->fo);
          }
 
          free( prefix);
@@ -803,21 +800,18 @@ void output_spectrum_record( struct timeval *tv)
 
       if( CF_output_header)
       {
-         // Header record required.  Output a header only if the file is
-         // empty - this may be a restart.
+         // Header record required.  Output a header every time sidc
+	 // is started - only way to handle band changes etc
          struct stat st;
 
          if( stat( filename, &st) < 0) 
             bailout( "cannot stat output file %s: %s", 
                filename, strerror( errno));
 
-         if( !st.st_size)
-         {
-            fputs( "FREQ ", sf_fo);
-            for( i = cuton; i < cutoff; i++)
-               fprintf( sf_fo, "%.2f ", (i+0.5) * DF);
-            fputs( "\n", sf_fo);
-         }
+         fputs( "# FREQ ", sf_fo);
+         for( i = cuton; i < cutoff; i++)
+            fprintf( sf_fo, "%.2f ", (i+0.5) * DF);
+         fputs( "\n", sf_fo);
       }
 
       free( filename);
