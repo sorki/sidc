@@ -5,6 +5,7 @@
 # Copyright 2005, Peter Schnoor (DF3LP)
 # Copyright 2009, Marek Mahut <mmahut@fedoraproject.org>
 # Copyright 2009, Lubomir Rintel <lkundrak@v3.sk>
+# Copyright 2010, Richard Marko <rissko@gmail.com>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
