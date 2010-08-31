@@ -66,6 +66,10 @@ in the config file.
  -c config_file   Run with a specified config file.  By default, sidc looks
                   for /etc/sidc.conf
 
+ -p pid_file   Override default PID file location which is /var/run/sidc.pid.
+        Pid file is created everytime this process becomes a daemon. Creation
+        is skipped if file is not writable.
+
 4 Miscellaneous notes
 ----------------------
 - sidc will set the soundcard to the nearest available sample rate to that

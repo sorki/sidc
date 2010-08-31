@@ -28,6 +28,7 @@
 //
 //  Name of the default configuration file.  Override with -c option
 #define CONFIG_FILE "/etc/sidc.conf"
+#define PID_FILE "/var/run/sidc.pid"
 
 //
 //  End of tuneable definitions.
@@ -124,6 +125,7 @@
 //
 
 char *config_file = CONFIG_FILE;
+char *pid_file = PID_FILE;
 
 int CF_chans = 1;                                      //  1 = mono, 2 = stereo
 int CF_bytes = 2;                                        // Sample width, bytes
@@ -1287,6 +1289,14 @@ void make_daemon( void)
    for( fd = 0; fd < open_max; fd++) close( fd);
 
    background = 2;
+
+   FILE *fp;
+   if (( fp = fopen(pid_file, "w")) != NULL) {
+      fprintf(fp, "%ld\n", (long)getpid());
+      fclose(fp);
+   } else {
+      report( 0, "PID file %s not writable (permissions?), skipping", pid_file);
+   }
 }
 
 void initialise_channel( struct CHAN *c)
@@ -1340,14 +1350,16 @@ int main( int argc, char *argv[])
 {
    while( 1)
    {
-      int c = getopt( argc, argv, "vfmic:");
+      int c = getopt( argc, argv, "vfmic:p:");
 
       if( c == 'v') VFLAG++;
       else
       if( c == 'f') background = 0;
       else
       if( c == 'c') config_file = optarg;
-      else 
+      else
+      if( c == 'p') pid_file = optarg;
+      else
       if( c == -1) break;
       else bailout( "unknown option [%c]", c);
    }
