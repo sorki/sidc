@@ -1266,6 +1266,7 @@ void load_config( void)
 void make_daemon( void)
 {
    int childpid, fd;
+   pid_t sid;
    long open_max = OPEN_MAX;
 
    if( (childpid = fork()) < 0)
