@@ -18,6 +18,7 @@ It is forked from sidd program wirrten by Paul Nicholson <sid0807@abelian.org> h
 - Configure and compile the source
 
    ./configure
+
    make
 
 - Install the source (if appliable)
