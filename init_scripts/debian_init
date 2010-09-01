@@ -15,7 +15,7 @@
 NAME='sidc'
 DESC=''
 DAEMON=/usr/bin/sidc
-DAEMON_ARGS=''
+DAEMON_ARGS='-v'
 SIDC_PIDFILE=/var/run/sidc.pid
 
 test -x $DAEMON || DAEMON=/usr/local/bin/sidc
@@ -51,9 +51,6 @@ case "$1" in
 		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
 	esac
 	;;
-  status)
-       status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
-       ;;
   restart|force-reload)
 	log_daemon_msg "Restarting $DESC" "$NAME"
 	do_stop
@@ -73,7 +70,7 @@ case "$1" in
 	esac
 	;;
   *)
-	echo "Usage: $0 {start|stop|status|restart|force-reload}" >&2
+	echo "Usage: $0 {start|stop|restart|force-reload}" >&2
 	exit 3
 	;;
 esac
