@@ -83,6 +83,4 @@ in the config file.
   30Mbytes.    Arrange scripts for plotting.  Arrange scripts for compressing
   and archiving files that are a few days old.
 
-- If your PC is set to autoboot after a power outage, you might want to put
-  a startup command for sidc into /etc/rc.d/rc.local or similar - but make
-  sure the RTC and mixer setting commands are done first.
+- Simple init scripts provided. Check the readme in `init_scripts` directory.

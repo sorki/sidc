@@ -1,0 +1,79 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          sidc
+# Required-Start:    $remote_fs $syslog $all
+# Required-Stop: 
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: sudden ionospheric disturbance collector 
+### END INIT INFO
+
+# Author: Richard Marko <rissko@gmail.com>
+
+# /etc/init.d/sidc: start and stop the sidc daemon
+
+NAME='sidc'
+DESC=''
+DAEMON=/usr/bin/sidc
+DAEMON_ARGS=''
+SIDC_PIDFILE=/var/run/sidc.pid
+
+test -x $DAEMON || DAEMON=/usr/local/bin/sidc
+test -x $DAEMON || exit 0
+
+. /lib/init/vars.sh
+. /lib/lsb/init-functions
+
+do_start() {
+	alsactl restore
+	sleep 1
+	su -c "$DAEMON $DAEMON_ARGS" sidc
+	return 0
+}
+do_stop() {
+	killall $DAEMON > /dev/null 2>&1
+	return 0
+}
+case "$1" in
+  start)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+	do_start
+	case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
+	;;
+  stop)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	do_stop
+	case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
+	;;
+  status)
+       status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
+       ;;
+  restart|force-reload)
+	log_daemon_msg "Restarting $DESC" "$NAME"
+	do_stop
+	case "$?" in
+	  0|1)
+		do_start
+		case "$?" in
+			0) log_end_msg 0 ;;
+			1) log_end_msg 1 ;; # Old process is still running
+			*) log_end_msg 1 ;; # Failed to start
+		esac
+		;;
+	  *)
+	  	# Failed to stop
+		log_end_msg 1
+		;;
+	esac
+	;;
+  *)
+	echo "Usage: $0 {start|stop|status|restart|force-reload}" >&2
+	exit 3
+	;;
+esac
