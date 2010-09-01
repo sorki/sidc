@@ -1274,6 +1274,12 @@ void make_daemon( void)
 
    if( setpgrp() == -1) bailout( "cannot setpgrp");
 
+   umask(022);
+
+   sid = setsid();
+   if( sid < 0) bailout("cannot get unique sid");
+   if( chdir("/") < 0) bailout("cannot change working dir");
+
 #ifdef TIOCNOTTY
    if( (fd = open( "/dev/tty", O_RDWR)) >= 0)
    {
