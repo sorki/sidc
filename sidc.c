@@ -1273,8 +1273,6 @@ void make_daemon( void)
       bailout( "cannot fork: %s", strerror( errno));
    else if( childpid > 0) exit( 0);
 
-   if( setpgrp() == -1) bailout( "cannot setpgrp");
-
    umask(022);
 
    sid = setsid();
