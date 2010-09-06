@@ -15,7 +15,11 @@ It is forked from sidd program wirrten by Paul Nicholson <sid0807@abelian.org> h
 - First install FFTW3 dependency from www.fftw.org or use your favorite package manager
   to install `fftw-devel` package.
 
+- Install `alsa-lib-devel` package if you want to use alsa (optional).
+
 - Configure and compile the source
+
+   autoconf
 
    ./configure
 
