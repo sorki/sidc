@@ -5,7 +5,7 @@
 # Required-Stop: 
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: sudden ionospheric disturbance collector 
+# Short-Description: sudden ionospheric disturbance collector
 ### END INIT INFO
 
 # Author: Richard Marko <rissko@gmail.com>
