@@ -1,0 +1,8 @@
+Makefile
+sidc
+configure
+config.log
+config.status
+config.h
+config.h.in~
+autom4te.cache/
