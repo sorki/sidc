@@ -30,7 +30,7 @@ It is forked from sidd program wirrten by Paul Nicholson <sid0807@abelian.org> h
    make install
 
 - Edit sidc.conf to suit your requirements.  Select an output policy from the
-  three available.  
+  three available.
 
 - Start sidc in verbose foreground mode with the command
 
@@ -44,7 +44,7 @@ It is forked from sidd program wirrten by Paul Nicholson <sid0807@abelian.org> h
 
 - Check the data file columns are the ones you want.
 
-- Set your PC clock and activate your favourite time synchronisation 
+- Set your PC clock and activate your favourite time synchronisation
   software.  Make sure it slews the clock rather than stepping the time.
 
 - Restart sidc in background with
@@ -59,9 +59,9 @@ It is forked from sidd program wirrten by Paul Nicholson <sid0807@abelian.org> h
 ------------------------
 
 There are just a few command line options - most controls are
-in the config file. 
+in the config file.
 
- -v    Be a little more verbose with log messages. 
+ -v    Be a little more verbose with log messages.
        Use several -v for more detail.
 
  -f    Run in foreground.  By default, sidc detaches from the process
@@ -84,7 +84,7 @@ in the config file.
   and if sidc reports the mode unavailable, use 'bits 32'.
 
 - Make sure you have enough disk space.   The example sidc.conf with 8 bands
-  generates files of about 100Mbytes per day, which compress down to about 
+  generates files of about 100Mbytes per day, which compress down to about
   30Mbytes.    Arrange scripts for plotting.  Arrange scripts for compressing
   and archiving files that are a few days old.
 

@@ -145,7 +145,7 @@ int background = 1;                        // Set zero if running in foreground
 int VFLAG = 0;                                    //  Set non-zero by -v option
 
 double CF_uspec_secs = 30  ;    // Issue a spectrum for every spec_secs seconds
-char *CF_uspec_file = NULL;                     // Filename of utility spectrum 
+char *CF_uspec_file = NULL;                     // Filename of utility spectrum
 int uspec_cnt = 0;                        // Frame counter for utility spectrum
 int uspec_max = 0;                     // Number of frames per utility spectrum
 
@@ -176,7 +176,7 @@ int grab_cnt = 0;                       // Count of samples into the FFT buffer
 char *logfile = "/var/log/sidc/sidc.log";
 char *CF_device = DEVICE;                              // Soundcard device name
 
-char CF_datadir[100] = "/var/lib/sidc/";                       // Directory for output files
+char CF_datadir[100] = "/var/lib/sidc/";          // Directory for output files
 
 #define FFTWID (2 * CF_bins)                  // Number of samples per FT frame
 
@@ -280,11 +280,11 @@ void report( int level, char *format, ...)
       time_t now = time( NULL);
       struct tm *tm = gmtime( &now);
       FILE *flog = NULL;
-   
+
       if( (flog = fopen( logfile, "a+")) == NULL)
          bailout( "cannot open logfile [%s]: %s", logfile, strerror( errno));
-   
-      fprintf( flog, "%04d/%02d/%02d %02d:%02d:%02d ", 
+
+      fprintf( flog, "%04d/%02d/%02d %02d:%02d:%02d ",
                 tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
                 tm->tm_hour, tm->tm_min, tm->tm_sec);
       va_start( ap2, format);
@@ -304,7 +304,7 @@ void alert( char *format, ...)
    va_start( ap, format);
    vsprintf( temp, format, ap);
    va_end( ap);
- 
+
    report( -1, "%s", temp);
 
    if( !alert_on || !CF_mailaddr) return;
@@ -322,7 +322,7 @@ void alert( char *format, ...)
 
 //
 //  We try to exit the program through here, if possible.
-//  
+//
 
 void bailout( char *format, ...)
 {
@@ -341,7 +341,7 @@ void bailout( char *format, ...)
 
 //
 //  Exit with a message if we get any signals.
-//  
+//
 
 void handle_sigs( int signum)
 {
@@ -387,10 +387,10 @@ void utility_spectrum( void)
       bailout( "cannot open spectrum file %s", strerror( errno));
 
    if( CF_chans == 1)
-      for( i=0; i<CF_bins; i++) fprintf( f, "%.5e %.5e\n", 
+      for( i=0; i<CF_bins; i++) fprintf( f, "%.5e %.5e\n",
              (i+0.5) * DF, left.sigavg[i]/uspec_max);
    else
-      for( i=0; i<CF_bins; i++) fprintf( f, "%.5e %.5e %.5e\n", 
+      for( i=0; i<CF_bins; i++) fprintf( f, "%.5e %.5e %.5e\n",
              (i+0.5) * DF, left.sigavg[i]/uspec_max,
                           right.sigavg[i]/uspec_max);
    fclose( f);
@@ -426,7 +426,7 @@ void setup_input_stream( void)
    if( fstat( capture_handle, &st) < 0)
       bailout( "cannot stat input stream: %s", strerror( errno));
 
-   if( !S_ISCHR( st.st_mode)) 
+   if( !S_ISCHR( st.st_mode))
       bailout( "%s is not a character device", CF_device);
 
 //   int blksize;
@@ -495,14 +495,14 @@ int read_soundcard( char *buf)
       if( ++retry_cnt == 5)
          bailout( "audio read failed, %s", strerror( errno));
 
-      if( !ne || errno == ENOENT || errno == 0) 
-      {  
+      if( !ne || errno == ENOENT || errno == 0)
+      {
          sched_yield();
-         usleep( 10000); 
+         usleep( 10000);
          continue;
       }
 
-      report( 2, "soundcard read failed: %s, retry %d", 
+      report( 2, "soundcard read failed: %s, retry %d",
                          strerror( errno), retry_cnt);
    }
 
@@ -521,8 +521,8 @@ void setup_input_stream( void)
    int err;
    snd_pcm_hw_params_t *hw_params;
 
-   if( (err = snd_pcm_open( &capture_handle, CF_device, 
-                            SND_PCM_STREAM_CAPTURE, 0)) < 0) 
+   if( (err = snd_pcm_open( &capture_handle, CF_device,
+                            SND_PCM_STREAM_CAPTURE, 0)) < 0)
       bailout( "cannot open audio device %s (%s)\n",
          CF_device, snd_strerror( err));
 
@@ -568,7 +568,7 @@ int read_soundcard( char *buf)
 
    while( (ne = snd_pcm_readi( capture_handle, buf, CF_nread)) < 0)
    {
-      if( ++retry_cnt == 5) 
+      if( ++retry_cnt == 5)
          bailout( "audio read failed, %s", snd_strerror( ne));
 
       report( 2, "soundcard read failed: %s, retry %d",
@@ -666,7 +666,7 @@ void output_record_multi( struct timeval *tv)
       if( out_prefix) free( out_prefix);
       out_prefix = strdup( prefix);
 
-      append_sprintf( &filename, "%s/%s", CF_datadir, out_prefix); 
+      append_sprintf( &filename, "%s/%s", CF_datadir, out_prefix);
       report( 0, "using output file [%s]", filename);
 
       if( bm_fo) fclose( bm_fo);
@@ -676,11 +676,11 @@ void output_record_multi( struct timeval *tv)
       if( CF_output_header)
       {
          // Header record required.  Output a header every time sidc
-	 // is started - only way to handle band changes etc
+         // is started - only way to handle band changes etc
          struct stat st;
 
          if( stat( filename, &st) < 0) 
-            bailout( "cannot stat output file %s: %s", 
+            bailout( "cannot stat output file %s: %s",
                filename, strerror( errno));
 
          fputs( "# stamp lpeak rpeak lrms rrms ", bm_fo);
@@ -742,11 +742,11 @@ void output_record_each( struct timeval *tv)
          if( CF_output_header)
          {
             // Header record required.  Output a header every time sidc
-	    // is started - only way to handle band changes etc
+            // is started - only way to handle band changes etc
             struct stat st;
 
-            if( stat( filename, &st) < 0) 
-               bailout( "cannot stat output file %s: %s", 
+            if( stat( filename, &st) < 0)
+               bailout( "cannot stat output file %s: %s",
                   filename, strerror( errno));
 
             fputs( "# stamp power\n", b->fo);
@@ -804,11 +804,11 @@ void output_spectrum_record( struct timeval *tv)
       if( CF_output_header)
       {
          // Header record required.  Output a header every time sidc
-	 // is started - only way to handle band changes etc
+         // is started - only way to handle band changes etc
          struct stat st;
 
          if( stat( filename, &st) < 0) 
-            bailout( "cannot stat output file %s: %s", 
+            bailout( "cannot stat output file %s: %s",
                filename, strerror( errno));
 
          fputs( "# FREQ ", sf_fo);
@@ -824,7 +824,7 @@ void output_spectrum_record( struct timeval *tv)
    fprintf( sf_fo, "%s", stamp);
 
    for( i=cuton; i<cutoff; i++)
-   { 
+   {
       double e = left.powspec[i]/output_int;
       if( CF_log_scale) e = CF_offset_db + 10 * log10( e + 1e-9);
       fputs( " ", sf_fo);
@@ -843,13 +843,13 @@ void output_record( void)
    struct timeval tv;
 
    if( CF_chans == 2)
-      report( 2, "peak/rms left=%.3f/%.3f right=%.3f/%.3f", 
+      report( 2, "peak/rms left=%.3f/%.3f right=%.3f/%.3f",
               left.peak, sqrt( left.sum_sq/(FFTWID * output_int)),
               right.peak, sqrt( right.sum_sq/(FFTWID * output_int)));
    else
-      report( 2, "peak/rms %.3f/%.3f", 
+      report( 2, "peak/rms %.3f/%.3f",
               left.peak, sqrt( left.sum_sq/FFTWID));
- 
+
    gettimeofday( &tv, NULL);
 
    if( CF_output_policy == OP_SPECTRUM) output_spectrum_record( &tv);
@@ -885,8 +885,8 @@ void process_fft( struct CHAN *c)
    c->powspec[ 0] = 0.0;  // Zero the DC component
    for( i=1; i<CF_bins; i++)
    {
-      double t1 = c->fft_data[i][0];  
-      double t2 = c->fft_data[i][1]; 
+      double t1 = c->fft_data[i][0];
+      double t2 = c->fft_data[i][1];
       double f = t1*t1 + t2*t2;
       c->powspec[ i] += f;                    // Accumulator for output records
       c->sigavg[i] += f;                    // Accumulator for utility spectrum
@@ -931,7 +931,7 @@ static inline void maybe_do_fft( void)
    if( ++uspec_cnt == uspec_max)
    {
       uspec_cnt = 0;
-      utility_spectrum(); 
+      utility_spectrum();
    }
 }
 
@@ -945,7 +945,7 @@ void process_signal( void)
 
    if( !buff) bailout( "not enough memory for input buffer");
 
-   while( 1) 
+   while( 1)
    {
       int i, q;
       double f;
@@ -1122,7 +1122,7 @@ void load_config( void)
          CF_range2 = atoi( fields[2]);
       }
       else
-      if( nf == 5 && !strcasecmp( fields[0], "band")) 
+      if( nf == 5 && !strcasecmp( fields[0], "band"))
          config_band( fields[1], fields[2], fields[3], fields[4]);
       else
       if( nf == 2 && !strcasecmp( fields[0], "logfile"))
@@ -1138,7 +1138,7 @@ void load_config( void)
       {
          CF_los_thresh = atof( fields[1]);
          CF_los_timeout = atoi( fields[2]);
-         report( 1, "los threshold %.3f, timeout %d seconds", 
+         report( 1, "los threshold %.3f, timeout %d seconds",
                     CF_los_thresh, CF_los_timeout);
       }
       else
@@ -1378,11 +1378,11 @@ int main( int argc, char *argv[])
       struct BAND *b;
 
       for( i=0, b=bands; i<nbands; i++, b++)
-         report( 1, "band %s %d %d %s", 
+         report( 1, "band %s %d %d %s",
             b->ident, b->start, b->end, b->side->name);
    }
 
-   if( background && !logfile) 
+   if( background && !logfile)
       report( -1, "warning: no logfile specified for daemon");
 
    if( background) make_daemon();
@@ -1420,7 +1420,7 @@ int main( int argc, char *argv[])
    setup_hamming_window();
 
    if( CF_card_delay) sleep( CF_card_delay);
-   report( 0, "sidc version %s %s: starting work", 
+   report( 0, "sidc version %s %s: starting work",
       PACKAGE_VERSION, soundsystem);
    alert_on = 1;
    if( CF_priority) set_scheduling();   // Setup real time scheduling
@@ -1443,4 +1443,3 @@ int main( int argc, char *argv[])
       free( out_prefix);
    return 0;
 }
-

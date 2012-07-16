@@ -42,7 +42,7 @@ AC_SEARCH_LIBS( sqrt, [m], , [
 AC_SEARCH_LIBS([fftw_execute], [fftw3], , [
    echo
    echo 'ERROR: Cannot find fftw library.'
-   echo 'Download and install fftw3 from www.fftw.org.' 
+   echo 'Download and install fftw3 from www.fftw.org.'
    echo
    exit 1
 ])
@@ -50,9 +50,9 @@ AC_SEARCH_LIBS([fftw_execute], [fftw3], , [
 AC_SEARCH_LIBS([snd_pcm_open], [asound],
     [AC_DEFINE( [ALSA], [1], [Use ALSA interface])
        echo
-       echo 'Configured for ALSA' 
+       echo 'Configured for ALSA'
        echo ] ,
-    [AC_DEFINE( [OSS], [1], [Use OSS if ALSA not available]) 
+    [AC_DEFINE( [OSS], [1], [Use OSS if ALSA not available])
        echo
        echo 'Configured for OSS'
        echo 
