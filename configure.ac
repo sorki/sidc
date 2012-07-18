@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(sidc, 1.3, rissko@gmail.com)
+AC_INIT(sidc, 1.4, rissko@gmail.com)
 AC_CONFIG_SRCDIR([sidc.c])
 AC_CONFIG_HEADER([config.h])
 
