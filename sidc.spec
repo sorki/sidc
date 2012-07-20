@@ -1,7 +1,7 @@
-%define tardirname sorki-sidc-3838f9d
+%define tardirname sorki-sidc-7183373
 
 Name:           sidc
-Version:        1.5
+Version:        1.7
 Release:        1%{?dist}
 Summary:        A VLF signal monitor for recording sudden ionospheric disturbances
 
@@ -33,13 +33,15 @@ make %{?_smp_mflags}
 %install
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_sysconfdir}
-install -d %{buildroot}%{_unitdir}
 install -d %{buildroot}%{_localstatedir}/lib/sidc
 install -d %{buildroot}%{_localstatedir}/log/sidc
 install -d %{buildroot}%{_localstatedir}/run/sidc
 
 make DESTDIR=%{buildroot} install
-install -m 0644 sidc.service %{buildroot}%{_unitdir}/sidc.service
+
+install -Dm 644 sidc.service %{buildroot}%{_unitdir}/sidc.service
+install -Dm 644 sidc.sysconf %{buildroot}%{_sysconfdir}/sysconfig/sidc
+install -Dm 644 sidc.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/sidc
 
 %files
 %doc README.rst
@@ -47,10 +49,12 @@ install -m 0644 sidc.service %{buildroot}%{_unitdir}/sidc.service
 %doc LICENSE
 %{_bindir}/sidc
 %config(noreplace) %{_sysconfdir}/sidc.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/sidc
+%config(noreplace) %{_sysconfdir}/logrotate.d/sidc
 %{_unitdir}/sidc.service
-%dir %attr(0775, sidc, sidc) %{_localstatedir}/lib/sidc
-%dir %attr(0775, sidc, sidc) %{_localstatedir}/log/sidc
-%dir %attr(0775, sidc, sidc) %{_localstatedir}/run/sidc
+%dir %attr(-, sidc, sidc) %{_localstatedir}/lib/sidc
+%dir %attr(-, sidc, sidc) %{_localstatedir}/log/sidc
+%dir %attr(-, sidc, sidc) %{_localstatedir}/run/sidc
 
 %pre
 getent group sidc >/dev/null || groupadd -r sidc
@@ -63,6 +67,10 @@ exit 0
 systemctl --system daemon-reload
 
 %changelog
+* Mon Jul 21 2012 Richard Marko <rmarko@redhat.com> - 1.7-1
+- Version bump, adding logrotate and sysconfig config files
+* Mon Jul 20 2012 Richard Marko <rmarko@redhat.com> - 1.6-1
+- Version bump, fixed attr issue
 * Mon Jul 20 2012 Richard Marko <rmarko@redhat.com> - 1.5-1
 - Version bump, systemd compatible now
 * Mon Jul 19 2012 Richard Marko <rmarko@redhat.com> - 1.4-1
