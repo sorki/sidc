@@ -1,6 +1,6 @@
 DESTDIR =
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+prefix =
+exec_prefix = /usr
 datarootdir = @datarootdir@
 datadir = @datadir@
 topdir = @srcdir@
@@ -8,6 +8,8 @@ srcdir = @srcdir@
 
 bindir = $(DESTDIR)@bindir@
 mandir = $(DESTDIR)@mandir@/man1
+sysconfdir = $(DESTDIR)@sysconfdir@
+localstatedir = $(DESTDIR)@localstatedir@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
@@ -20,9 +22,15 @@ $(topdir)/sidc: $(srcdir)/sidc.c
 
 install: $(topdir)/sidc
 	install sidc -s $(bindir)
+	install -m 0644 sidc.conf $(sysconfdir)/sidc.conf
+	install -d $(localstatedir)/lib/sidc
+	install -d $(localstatedir)/log/sidc
+	install -d $(localstatedir)/run/sidc
 
 uninstall:
 	rm -f $(bindir)/sidc
+	rm -rf $(localstatedir)/log/sidc
+	rm -rf $(localstatedir)/run/sidc
 
 clean:
 	rm -f $(topdir)/sidc
