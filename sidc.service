@@ -1,0 +1,12 @@
+[Unit]
+Description=A VLF signal monitor for recording sudden ionospheric disturbances
+After=alsa-restore.service
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/sidc -v
+PIDFile=/var/run/sidc/sidc.pid
+User=sidc
+
+[Install]
+WantedBy=multi-user.target
