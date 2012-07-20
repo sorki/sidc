@@ -28,7 +28,7 @@
 //
 //  Name of the default configuration file.  Override with -c option
 #define CONFIG_FILE "/etc/sidc.conf"
-#define PID_FILE "/var/run/sidc.pid"
+#define PID_FILE "/var/run/sidc/sidc.pid"
 
 //
 //  End of tuneable definitions.
