@@ -1,0 +1,8 @@
+/var/log/sidc/*.log {
+    rotate 5
+    size 100k
+    weekly
+    copytruncate
+    missingok
+    su sidc sidc
+}
