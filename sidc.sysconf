@@ -1,0 +1,7 @@
+#
+# sidc daemon options
+#
+SIDC_OPTIONS="-v"
+#SIDC_OPTIONS="-vv"
+#SIDC_OPTIONS="-vvv"
+

@@ -4,7 +4,8 @@ After=alsa-restore.service
 
 [Service]
 Type=forking
-ExecStart=/usr/bin/sidc -v
+EnvironmentFile=-/etc/sysconfig/sidc
+ExecStart=/usr/bin/sidc $SIDC_OPTIONS
 PIDFile=/var/run/sidc/sidc.pid
 User=sidc
 
